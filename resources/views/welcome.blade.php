@@ -47,7 +47,27 @@
         
     </div>
 
-
+    <div class="row justify-content-center">
+            <h2>Score Board</h2>
+            <table class="table table-stripped">
+                <thead>
+                    <tr>
+                        <th>Player names</th>
+                        <th>Total games played</th>
+                        <th>Total games won</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($score_board as $score)
+                    <tr>
+                        <td>{{ $score->player_name }}</td>
+                        <td>{{ $score->total_played }}</td>
+                        <td>{{ $score->total_won }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
             </div>
         </div>
 

@@ -7,9 +7,29 @@ use App\Http\Requests\GameRequest;
 use App\Services\PlayService;
 use App\Game;
 use App\Player;
+use Validator;
+use DB;
 
 class GameController extends Controller
 {
+    public function score_board(){
+        $score_board = $this->scores();
+        return view('welcome', compact('score_board'));
+    }
+
+    public function scores(){
+        $score = Game::with([
+            'player'
+        ])
+        ->select(DB::raw("player_id,count(*) as total_played, sum(user_won) as total_won, players.player_name"))
+        ->join('players', 'players.id', '=', 'games.player_id')
+        ->groupBy('player_id')
+        ->orderBy('total_won', 'desc')
+        ->limit(25)
+        ->get();
+        return $score;
+    }
+
     public function play(GameRequest $request){
         if(isset($request->validator) && $request->validator->fails()) {
             return response()->json([
