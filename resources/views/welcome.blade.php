@@ -37,6 +37,7 @@
                         <input type="text" name="player_cards" class="form-control"  placeholder="Valid cards are: 2,3,4,5,6,7,8,9,10,J,Q,K,A" id="player_cards" required>
                     </div>
                     
+                   <div id="winner_results"></div> 
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary">Play</button>
                     </div>
@@ -49,6 +50,7 @@
 
     <div class="row justify-content-center">
             <h2>Score Board</h2>
+            <div class="scoreboardajax">
             <table class="table table-stripped">
                 <thead>
                     <tr>
@@ -67,6 +69,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
             </div>
         </div>
@@ -85,8 +88,29 @@ $(document).ready(function () {
             method: "POST",
             data: {player_name:$('#player_name').val(), player_cards:$('#player_cards').val()},
             success: function (result) {
-                
-                alert(result);
+                if(result.generated_cards!=""){
+                    console.log(result);
+                    $('.scoreboardajax').html('');
+                   var str = '';
+                   str+='<div>Computer Cards:'+ result.generated_cards +'</div>';
+                   str+='<div>Your Score:'+ result.player_score +'</div>';
+                   str+='<div>Computer Score:'+ result.computer_score +'</div>';
+                   str+='<div>Winner:'+ result.winner +'</div>';
+                   $('#winner_results').html(str);
+
+                    
+                   var scoreboard = '';
+                   scoreboard +='<table class="table table-stripped"><thead><tr><th>Player names</th><th>Total games played</th><th>Total games won</th></tr></thead><tbody>';
+                   $.each(result.score_board, function(k, v) {
+                        scoreboard += '<tr><td>'+v.player_name+'</td>';
+                        scoreboard += '<td>'+v.total_played+'</td>';
+                        scoreboard += '<td>'+v.total_won+'</td></tr>';
+                    });
+                    scoreboard +='</tbody></table>';
+                    $('.scoreboardajax').html(scoreboard);
+                    //$('.scoreboardajax').css('display','block');
+                   
+                }
             },
         });
     });

@@ -53,13 +53,15 @@ class GameController extends Controller
             'computer_score'=> $generatedScore,
             'user_won'      => ($generatedScore <= $playerScore)
         ]);
+        $score_board = $this->scores();
         return response()->json([
             "message" => ($generatedScore <= $playerScore) ? "Congratulations! You are the winner." : "Sorry! You lost this game.", 
             "success" =>  true, 
             "generated_cards" => implode(",", $generatedCards),
             "player_score"      => $playerScore,
             "computer_score"    => $generatedScore,
-            "winner" => ($generatedScore <= $playerScore) ? $request->player_name : "Computer"
+            "winner" => ($generatedScore <= $playerScore) ? $request->player_name : "Computer",
+            "score_board" =>$score_board
         ], 200);
     }
 }
