@@ -28,6 +28,7 @@
             <div class="col-md-8">
                 <h2>New Game</h2>
                 <form id="play_game" name="play_game">
+                <div class="error" style="color:red;"></div>
                     <div class="form-group">
                         <label for="">Player Name</label>
                         <input type="text" name="player_name" class="form-control"id="player_name" placeholder="Enter your name" required>
@@ -88,29 +89,38 @@ $(document).ready(function () {
             method: "POST",
             data: {player_name:$('#player_name').val(), player_cards:$('#player_cards').val()},
             success: function (result) {
-                if(result.generated_cards!=""){
-                    console.log(result);
-                    $('.scoreboardajax').html('');
-                   var str = '';
-                   str+='<div>Computer Cards:'+ result.generated_cards +'</div>';
-                   str+='<div>Your Score:'+ result.player_score +'</div>';
-                   str+='<div>Computer Score:'+ result.computer_score +'</div>';
-                   str+='<div>Winner:'+ result.winner +'</div>';
-                   $('#winner_results').html(str);
-
-                    
-                   var scoreboard = '';
-                   scoreboard +='<table class="table table-stripped"><thead><tr><th>Player names</th><th>Total games played</th><th>Total games won</th></tr></thead><tbody>';
-                   $.each(result.score_board, function(k, v) {
-                        scoreboard += '<tr><td>'+v.player_name+'</td>';
-                        scoreboard += '<td>'+v.total_played+'</td>';
-                        scoreboard += '<td>'+v.total_won+'</td></tr>';
+                if(result.success == false){
+                    var err_str ='';
+                    console.log(result.errors.player_cards);
+                    err_str += '<ul>';
+                    $.each(result.errors.player_cards, function(k,err) {
+                        err_str += '<li>'+err+'</li>';   
                     });
-                    scoreboard +='</tbody></table>';
-                    $('.scoreboardajax').html(scoreboard);
-                    //$('.scoreboardajax').css('display','block');
-                   
+                    err_str += '</ul>';
+                    $('.error').html(err_str);
+                } else{
+                    if(result.generated_cards!=""){
+                        $('.error').html('');
+                        $('.scoreboardajax').html('');
+                        var str = '';
+                        str+='<div>Computer Cards:'+ result.generated_cards +'</div>';
+                        str+='<div>Your Score:'+ result.player_score +'</div>';
+                        str+='<div>Computer Score:'+ result.computer_score +'</div>';
+                        str+='<div>Winner:'+ result.winner +'</div>';
+                        $('#winner_results').html(str);
+                            
+                        var scoreboard = '';
+                        scoreboard +='<table class="table table-stripped"><thead><tr><th>Player names</th><th>Total games played</th><th>Total games won</th></tr></thead><tbody>';
+                        $.each(result.score_board, function(k, v) {
+                                scoreboard += '<tr><td>'+v.player_name+'</td>';
+                                scoreboard += '<td>'+v.total_played+'</td>';
+                                scoreboard += '<td>'+v.total_won+'</td></tr>';
+                            });
+                            scoreboard +='</tbody></table>';
+                            $('.scoreboardajax').html(scoreboard);
+                    }
                 }
+                
             },
         });
     });
