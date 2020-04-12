@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Services;
+use App\Game;
+use App\Player;
+use DB;
 
 class PlayService {
 
@@ -14,7 +17,7 @@ class PlayService {
         return $generatedCards;
     }
 
-    public function play($playerCards, $generatedCards) {
+    public function play($playerCards, $generatedCards,$player_name) {
         $generatedScore = 0;
         $playerScore = 0;
         // Compare Player's and Generated Cards and calculate scores
@@ -27,10 +30,30 @@ class PlayService {
                 $generatedScore++;
             }
         }
+        $player = Player::firstOrCreate(['player_name' => $player_name]);
+        // Store game play in database
+        Game::create([
+            'player_id'   => $player->id,
+            'player_score'  => $playerScore,
+            'computer_score'=> $generatedScore,
+            'user_won'      => ($generatedScore <= $playerScore)
+        ]);
 
         return [
             'player_score'      => $playerScore,
             'generated_score'   => $generatedScore
         ];
+    }
+
+    public function getScores(){
+        return Game::with([
+            'player'
+        ])
+        ->select(DB::raw("player_id,count(*) as total_played, sum(user_won) as total_won, players.player_name"))
+        ->join('players', 'players.id', '=', 'games.player_id')
+        ->groupBy('player_id')
+        ->orderBy('total_won', 'desc')
+        ->limit(25)
+        ->get();
     }
 }

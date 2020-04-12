@@ -5,10 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\GameRequest;
 use App\Services\PlayService;
-use App\Game;
-use App\Player;
 use Validator;
-use DB;
 
 class GameController extends Controller
 {
@@ -18,16 +15,8 @@ class GameController extends Controller
     }
 
     public function scores(){
-        $score = Game::with([
-            'player'
-        ])
-        ->select(DB::raw("player_id,count(*) as total_played, sum(user_won) as total_won, players.player_name"))
-        ->join('players', 'players.id', '=', 'games.player_id')
-        ->groupBy('player_id')
-        ->orderBy('total_won', 'desc')
-        ->limit(25)
-        ->get();
-        return $score;
+        $playService = new PlayService();
+        return $playService->getScores();
     }
 
     public function play(GameRequest $request){
@@ -38,22 +27,13 @@ class GameController extends Controller
             ], 200);
         }
         $playerCards = explode(" ", $request->player_cards);
-       // echo "<pre>";print_r($playerCards);die;
         $playService = new PlayService();
         $generatedCards = $playService->generateCards($playerCards);
-        $result = $playService->play($playerCards, $generatedCards);
+        $result = $playService->play($playerCards, $generatedCards, $request->player_name);
         $playerScore = $result['player_score'];
         $generatedScore = $result['generated_score'];
-       // echo "<pre>";print_r($generatedScore);die;
-        $player = Player::firstOrCreate(['player_name' => $request->player_name]);
-        // Store game play in database
-        Game::create([
-            'player_id'   => $player->id,
-            'player_score'  => $playerScore,
-            'computer_score'=> $generatedScore,
-            'user_won'      => ($generatedScore <= $playerScore)
-        ]);
-        $score_board = $this->scores();
+      
+        $score_board = $playService->getScores();
         return response()->json([
             "message" => ($generatedScore <= $playerScore) ? "Congratulations! You are the winner." : "Sorry! You lost this game.", 
             "success" =>  true, 
