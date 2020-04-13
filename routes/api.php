@@ -17,3 +17,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::prefix('game')->group(function() {
+    Route::post('play', [
+        "uses"  => "GameController@play"
+    ]);
+    Route::get('leaderboard', [
+        "uses"  => "GameController@index"
+    ]);
+});

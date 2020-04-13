@@ -18,113 +18,16 @@
 
     </head>
     <body>
-        <div id="app">
+    <div id="app">
             <div class="container">
                 <h1>ACTO Card Game</h1>
                 <hr>
+                <card-game></card-game>
+            </div>
+        </div>
             
-    <div class="container">
-        <div class="row justify-content-center mb-4">
-            <div class="col-md-8">
-                <h2>New Game</h2>
-                <form id="play_game" name="play_game">
-                <div class="error" style="color:red;"></div>
-                    <div class="form-group">
-                        <label for="">Player Name</label>
-                        <input type="text" name="player_name" class="form-control"id="player_name" placeholder="Enter your name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="">Enter Cards</label>
-                        <input type="text" name="player_cards" class="form-control"  placeholder="Valid cards are: 2,3,4,5,6,7,8,9,10,J,Q,K,A" id="player_cards" required>
-                    </div>
-                    
-                   <div id="winner_results"></div> 
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Play</button>
-                    </div>
-
-                </form>
-            </div>
-        </div>
-        
-    </div>
-
-    <div class="row justify-content-center">
-            <h2>Score Board</h2>
-            <div class="scoreboardajax">
-            <table class="table table-stripped">
-                <thead>
-                    <tr>
-                        <th>Player names</th>
-                        <th>Total games played</th>
-                        <th>Total games won</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($score_board as $score)
-                    <tr>
-                        <td>{{ $score->player_name }}</td>
-                        <td>{{ $score->total_played }}</td>
-                        <td>{{ $score->total_won }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            </div>
-        </div>
-            </div>
-        </div>
-
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
-      <script type="text/javascript">
-$(document).ready(function () {
-    $("#play_game").submit(function (e) {
-            e.preventDefault();
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            url: "/play",
-            method: "POST",
-            data: {player_name:$('#player_name').val(), player_cards:$('#player_cards').val()},
-            success: function (result) {
-                if(result.success == false){
-                    var err_str ='';
-                    console.log(result.errors.player_cards);
-                    err_str += '<ul>';
-                    $.each(result.errors.player_cards, function(k,err) {
-                        err_str += '<li>'+err+'</li>';   
-                    });
-                    err_str += '</ul>';
-                    $('.error').html(err_str);
-                } else{
-                    if(result.generated_cards!=""){
-                        $('.error').html('');
-                        $('.scoreboardajax').html('');
-                        var str = '';
-                        str+='<div>Computer Cards:'+ result.generated_cards +'</div>';
-                        str+='<div>Your Score:'+ result.player_score +'</div>';
-                        str+='<div>Computer Score:'+ result.computer_score +'</div>';
-                        str+='<div>Winner:'+ result.winner +'</div>';
-                        $('#winner_results').html(str);
-                            
-                        var scoreboard = '';
-                        scoreboard +='<table class="table table-stripped"><thead><tr><th>Player names</th><th>Total games played</th><th>Total games won</th></tr></thead><tbody>';
-                        $.each(result.score_board, function(k, v) {
-                                scoreboard += '<tr><td>'+v.player_name+'</td>';
-                                scoreboard += '<td>'+v.total_played+'</td>';
-                                scoreboard += '<td>'+v.total_won+'</td></tr>';
-                            });
-                            scoreboard +='</tbody></table>';
-                            $('.scoreboardajax').html(scoreboard);
-                    }
-                }
-                
-            },
-        });
-    });
-});
-      </script>
+        <script src="{{ asset('js/app.js') }}"></script>
     </body>
 </html>

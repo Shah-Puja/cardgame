@@ -9,6 +9,15 @@ use Validator;
 
 class GameController extends Controller
 {
+    public function index()
+    {
+        $leaderboard = $this->scores();
+        return response()->json([
+            'success'   => true,
+            'leaderboard'   => $leaderboard
+        ], 200);
+    }
+    
     public function score_board(){
         $score_board = $this->scores();
         return view('welcome', compact('score_board'));
